@@ -31,3 +31,4 @@ O sistema opera de forma distribuída, simulando um ambiente real de microsservi
 2. Na raiz do projeto, execute o comando:
    ```bash
    docker-compose up --build
+
