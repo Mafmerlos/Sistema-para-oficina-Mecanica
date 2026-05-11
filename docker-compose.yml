@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:13
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: oficina_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+    volumes:
+      - pg_data:/var/lib/postgresql/data 
+    networks:
+      - oficina-net
+
+  mongo-db:
+    image: mongo:latest
+    container_name: mongo-db
+    volumes:
+      - mongo_data:/data/db 
+    networks:
+      - oficina-net
+
+  api-clientes:
+    build: ./api-clientes
+    container_name: api-clientes
+    ports:
+      - "8001:8000" 
+    depends_on:
+      - postgres-db
+    networks:
+      - oficina-net
+
+  api-produtos:
+    build: ./api-produtos
+    container_name: api-produtos
+    ports:
+      - "8002:8000"
+    depends_on:
+      - mongo-db
+    networks:
+      - oficina-net
+
+  api-pedidos:
+    build: ./api-pedidos
+    container_name: api-pedidos
+    ports:
+      - "8003:8000"
+    depends_on:
+      - api-clientes
+      - api-produtos
+    networks:
+      - oficina-net
+
+networks:
+  oficina-net: 
+    driver: bridge
+
+volumes:
+  pg_data: 
+  mongo_data:
