@@ -1,50 +1,82 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import requests
-import os
-from fastapi.middleware.cors import CORSMiddleware 
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
+CLIENTES_URL = "http://api-clientes:8000"
+PRODUTOS_URL = "http://api-produtos:8000"
 
-CLIENTES_URL = "http://api-clientes:8000/clientes"
-PRODUTOS_URL = "http://api-produtos:8000/produtos"
+pedidos_db = []
+proximo_id = 1
 
-@app.get("/")
-def home():
-    return {"servico": "Gerenciador de Pedidos - Oficina"}
-
-@app.post("/pedidos/gerar")
-def gerar_ordem_servico(cliente_id: int, nome_produto: str):
+@app.post("/pedidos/gerar", status_code=201)
+def gerar_ordem(cliente_id: int, nome_produto: str):
+    global proximo_id
     try:
-        clientes = requests.get(CLIENTES_URL).json()
-        cliente_valido = any(c['id'] == cliente_id for c in clientes)
-        
-        produtos = requests.get(PRODUTOS_URL).json()
-        produto_valido = any(p['nome'] == nome_produto for p in produtos)
+        clientes = requests.get(f"{CLIENTES_URL}/clientes").json()
+        cliente = next((c for c in clientes if c["id"] == cliente_id), None)
+        if not cliente:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado na api-clientes")
 
-        if cliente_valido and produto_valido:
-            return {
-                "status": "Ordem de Serviço Criada",
-                "detalhes": f"Cliente {cliente_id} solicitou peça: {nome_produto}"
-            }
-        return {"erro": "Cliente ou Produto não encontrado nas outras APIs"}
-        
+        produto = requests.get(f"{PRODUTOS_URL}/produtos/{nome_produto}").json()
+        if "detail" in produto:
+            raise HTTPException(status_code=404, detail="Produto não encontrado na api-produtos")
+
+        pedido = {
+            "id": proximo_id,
+            "cliente_id": cliente_id,
+            "cliente_nome": cliente["nome"],
+            "veiculo": cliente["veiculo"],
+            "produto": nome_produto,
+            "preco": produto["preco"],
+            "status": "aberto"
+        }
+        pedidos_db.append(pedido)
+        proximo_id += 1
+        return {"status": "Ordem de Serviço Criada", "pedido": pedido}
+
+    except HTTPException:
+        raise
     except Exception as e:
-        return {"erro": f"Falha na comunicação entre containers: {str(e)}"}
+        raise HTTPException(status_code=503, detail=f"Falha na comunicação: {str(e)}")
+
+@app.get("/pedidos")
+def listar():
+    return pedidos_db
+
+@app.get("/pedidos/{pedido_id}")
+def buscar(pedido_id: int):
+    pedido = next((p for p in pedidos_db if p["id"] == pedido_id), None)
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    return pedido
+
+@app.put("/pedidos/{pedido_id}")
+def atualizar(pedido_id: int, status: str):
+    pedido = next((p for p in pedidos_db if p["id"] == pedido_id), None)
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    pedido["status"] = status
+    return {"status": "Pedido atualizado!", "pedido": pedido}
+
+@app.delete("/pedidos/{pedido_id}")
+def remover(pedido_id: int):
+    global pedidos_db
+    tamanho = len(pedidos_db)
+    pedidos_db = [p for p in pedidos_db if p["id"] != pedido_id]
+    if len(pedidos_db) == tamanho:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    return {"status": "Pedido removido com sucesso!"}
 
 @app.get("/resumo-oficina")
 def resumo():
-    c = requests.get(CLIENTES_URL).json()
-    p = requests.get(PRODUTOS_URL).json()
+    c = requests.get(f"{CLIENTES_URL}/clientes").json()
+    p = requests.get(f"{PRODUTOS_URL}/produtos").json()
     return {
         "total_clientes": len(c),
-        "total_pecas_estoque": len(p)
+        "total_pecas_estoque": len(p),
+        "total_pedidos": len(pedidos_db)
     }
