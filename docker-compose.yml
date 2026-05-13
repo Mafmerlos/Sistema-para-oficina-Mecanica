@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   postgres-db:
@@ -70,13 +69,12 @@ services:
     build: ./frontend
     container_name: frontend
     ports:
-      - "8080:80"
+      - "8081:80"  
     depends_on:
       api-pedidos:
         condition: service_started
     networks:
       - oficina-net
-
 
   api-gateway:
     build: ./api-gateway

@@ -444,6 +444,18 @@ loadClientes();
 loadProdutos();
 checkStatus();
 setInterval(checkStatus, 30000);
+
+
+function refreshAll() {
+    loadClientes();
+    loadProdutos();
+    checkStatus();
+}
+
+
+refreshAll();
+setInterval(refreshAll, 5000);
+setInterval(checkStatus, 10000);
         </script>
     </body>
 </html>

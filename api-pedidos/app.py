@@ -1,8 +1,18 @@
 from fastapi import FastAPI
 import requests
 import os
+from fastapi.middleware.cors import CORSMiddleware 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 CLIENTES_URL = "http://api-clientes:8000/clientes"
 PRODUTOS_URL = "http://api-produtos:8000/produtos"

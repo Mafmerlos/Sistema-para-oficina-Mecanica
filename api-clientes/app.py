@@ -3,8 +3,18 @@ import psycopg2
 from pydantic import BaseModel
 import os
 import time
+from fastapi.middleware.cors import CORSMiddleware 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 DB_CONFIG = {
     "host": "postgres-db",

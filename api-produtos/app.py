@@ -2,8 +2,19 @@ from fastapi import FastAPI
 from pymongo import MongoClient
 from pydantic import BaseModel
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 
 client = MongoClient("mongodb://mongo-db:27017/")
 db = client.oficina_pecas
