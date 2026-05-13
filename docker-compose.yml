@@ -12,6 +12,11 @@ services:
       - pg_data:/var/lib/postgresql/data 
     networks:
       - oficina-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d oficina_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   mongo-db:
     image: mongo:latest
@@ -20,6 +25,11 @@ services:
       - mongo_data:/data/db 
     networks:
       - oficina-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   api-clientes:
     build: ./api-clientes
@@ -27,7 +37,8 @@ services:
     ports:
       - "8001:8000" 
     depends_on:
-      - postgres-db
+      postgres-db:
+        condition: service_healthy
     networks:
       - oficina-net
 
@@ -37,7 +48,8 @@ services:
     ports:
       - "8002:8000"
     depends_on:
-      - mongo-db
+      mongo-db:
+        condition: service_healthy
     networks:
       - oficina-net
 
@@ -47,8 +59,34 @@ services:
     ports:
       - "8003:8000"
     depends_on:
+      api-clientes:
+        condition: service_started
+      api-produtos:
+        condition: service_started
+    networks:
+      - oficina-net
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      api-pedidos:
+        condition: service_started
+    networks:
+      - oficina-net
+
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8000:80"
+    depends_on:
       - api-clientes
       - api-produtos
+      - api-pedidos
     networks:
       - oficina-net
 
