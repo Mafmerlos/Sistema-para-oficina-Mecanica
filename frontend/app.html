@@ -7,6 +7,7 @@
         <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
 
+  /* Definição de Variáveis para o Tema Escuro (Padrão) */
   :root {
     --bg: #09090b;
     --surface: #121214;
@@ -27,8 +28,28 @@
     --radius: 8px;
   }
 
+  /* Definição de Variáveis para o Tema Claro */
+  [data-theme="light"] {
+    --bg: #f4f4f5;
+    --surface: #ffffff;
+    --surface2: #e4e4e7;
+    --border: #d4d4d8;
+    --accent: #18181b;
+    --accent-hover: #27272a;
+    --text: #09090b;
+    --muted: #71717a;
+    --success: #059669;
+    --success-bg: rgba(16, 185, 129, 0.15);
+    --danger: #dc2626;
+    --danger-bg: rgba(239, 68, 68, 0.15);
+    --info: #2563eb;
+    --info-bg: rgba(59, 130, 246, 0.15);
+    --warning: #d97706;
+    --warning-bg: rgba(245, 158, 11, 0.15);
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; transition: background 0.3s ease, color 0.3s ease; }
 
   header {
     display: flex; align-items: center; justify-content: space-between;
@@ -36,16 +57,33 @@
     border-bottom: 1px solid var(--border);
     background: var(--surface);
     position: sticky; top: 0; z-index: 100;
+    transition: background 0.3s ease, border-color 0.3s ease;
   }
   .logo { display: flex; align-items: center; gap: 12px; }
   .logo-icon-svg { width: 32px; height: 32px; color: var(--text); display: flex; align-items: center; justify-content: center; }
   .logo h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
-  .status-bar { display: flex; gap: 8px; align-items: center; background: var(--surface2); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); }
+  
+  .header-actions { display: flex; align-items: center; gap: 1rem; }
+  
+  .status-bar { display: flex; gap: 8px; align-items: center; background: var(--surface2); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); transition: background 0.3s ease, border-color 0.3s ease; }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
   .status-label { font-size: 11px; color: var(--text); font-weight: 500; }
 
-  .tabs { display: flex; gap: 4px; padding: 0.75rem 2rem 0; border-bottom: 1px solid var(--border); background: var(--surface); }
+  /* Botão de Alternância de Tema */
+  .theme-toggle-btn {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    border-radius: var(--radius); width: 36px; height: 36px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+  }
+  .theme-toggle-btn:hover { border-color: var(--muted); background: var(--surface); }
+  .theme-toggle-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .theme-toggle-btn .sun-icon { display: block; }
+  .theme-toggle-btn .moon-icon { display: none; }
+  [data-theme="light"] .theme-toggle-btn .sun-icon { display: none; }
+  [data-theme="light"] .theme-toggle-btn .moon-icon { display: block; }
+
+  .tabs { display: flex; gap: 4px; padding: 0.75rem 2rem 0; border-bottom: 1px solid var(--border); background: var(--surface); transition: background 0.3s ease, border-color 0.3s ease; }
   .tab {
     padding: 10px 16px; font-size: 13px; font-weight: 500; cursor: pointer;
     border-radius: var(--radius) var(--radius) 0 0; border: 1px solid transparent;
@@ -62,23 +100,29 @@
   .metric-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 1.5rem;
-    position: relative; transition: border-color 0.2s ease;
+    position: relative; transition: border-color 0.2s ease, background 0.3s ease;
   }
-  .metric-card:hover { border-color: #3f3f46; }
+  .metric-card:hover { border-color: var(--muted); }
   .metric-label { font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
   .metric-value { font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: -0.5px; }
-  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 8px; font-family: 'DM Mono', monospace; display: inline-block; background: var(--surface2); padding: 2px 6px; border-radius: 4px; }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 8px; font-family: 'DM Mono', monospace; display: inline-block; background: var(--surface2); padding: 2px 6px; border-radius: 4px; transition: background 0.3s ease; }
 
-  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem; transition: background 0.3s ease, border-color 0.3s ease; }
   .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01); }
   .panel-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); display: flex; align-items: center; gap: 8px; }
   .panel-body { padding: 1.5rem; }
   .panel-actions { display: flex; gap: 8px; align-items: center; }
 
-  .tag { font-size: 10px; font-family: 'DM Mono', monospace; padding: 3px 8px; border-radius: 4px; background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  /* Ajuste de Contraste Profissional para as Tags de Rotas e Bancos */
+  .tag { font-size: 10px; font-family: 'DM Mono', monospace; padding: 3px 8px; border-radius: 4px; background: var(--surface2); color: var(--muted); border: 1px solid var(--border); transition: all 0.3s ease; }
   .tag.pg { color: #60a5fa; border-color: rgba(96, 165, 250, 0.2); background: rgba(96, 165, 250, 0.05); }
   .tag.mongo { color: #4ade80; border-color: rgba(74, 222, 128, 0.2); background: rgba(74, 222, 128, 0.05); }
   .tag.mem { color: #f87171; border-color: rgba(248, 113, 113, 0.2); background: rgba(248, 113, 113, 0.05); }
+
+  /* Correções de visibilidade específicas para o Tema Claro */
+  [data-theme="light"] .tag.pg { color: #1d4ed8; border-color: rgba(29, 78, 216, 0.3); background: rgba(29, 78, 216, 0.08); font-weight: 600; }
+  [data-theme="light"] .tag.mongo { color: #047857; border-color: rgba(4, 120, 87, 0.3); background: rgba(4, 120, 87, 0.08); font-weight: 600; }
+  [data-theme="light"] .tag.mem { color: #b91c1c; border-color: rgba(185, 28, 28, 0.3); background: rgba(185, 28, 28, 0.08); font-weight: 600; }
 
   .list-scroll { max-height: 350px; overflow-y: auto; }
   .list-scroll::-webkit-scrollbar { width: 6px; }
@@ -115,7 +159,7 @@
     color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px;
     padding: 10px 14px; outline: none; transition: all 0.15s ease; height: 40px;
   }
-  .field input:focus, .field select:focus { border-color: #52525b; background: var(--surface); }
+  .field input:focus, .field select:focus { border-color: var(--muted); background: var(--surface); }
   .field select option { background: var(--surface2); color: var(--text); }
 
   .form-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
@@ -126,11 +170,11 @@
   .btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .btn-primary { background: var(--accent); color: var(--bg); font-weight: 600; }
   .btn-ghost   { background: transparent; color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { background: var(--surface2); border-color: #3f3f46; }
+  .btn-ghost:hover { background: var(--surface2); border-color: var(--muted); }
   
   .btn-icon { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: var(--radius); width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; padding: 0; }
   .btn-icon svg { width: 14px; height: 14px; fill: currentColor; }
-  .btn-icon:hover { border-color: #3f3f46; color: var(--text); background: var(--surface2); }
+  .btn-icon:hover { border-color: var(--muted); color: var(--text); background: var(--surface2); }
   .btn-icon.del:hover { border-color: rgba(239, 68, 68, 0.4); color: var(--danger); background: var(--danger-bg); }
 
   .result-box { margin-top: 1rem; border-radius: var(--radius); padding: 12px 16px; font-family: 'DM Mono', monospace; font-size: 12px; display: none; }
@@ -141,12 +185,12 @@
   .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--text); border-radius: 50%; animation: spin 0.6s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .modal-bg.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; width: 440px; max-width: 95vw; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; width: 440px; max-width: 95vw; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.4); }
   .modal-title { font-size: 15px; font-weight: 600; margin-bottom: 1.25rem; color: var(--text); }
 
-  footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 4rem; letter-spacing: 0.2px; }
+  footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 4rem; letter-spacing: 0.2px; transition: border-color 0.3s ease; }
         </style>
     </head>
     <body>
@@ -170,9 +214,82 @@
                     <h1>Oficina Mecânica</h1>
                 </div>
             </div>
-            <div class="status-bar">
-                <div class="dot" id="status-dot"></div>
-                <span class="status-label" id="status-label">Sincronizando...</span>
+            <div class="header-actions">
+                <div class="status-bar">
+                    <div class="dot" id="status-dot"></div>
+                    <span class="status-label" id="status-label">Sincronizando...</span>
+                </div>
+                <button
+                    class="theme-toggle-btn"
+                    id="theme-toggle"
+                    onclick="toggleTheme()"
+                    title="Alternar tema"
+                >
+                    <svg
+                        class="sun-icon"
+                        viewBox="0 0 24 24"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line
+                            x1="12"
+                            y1="1"
+                            x2="12"
+                            y2="3"
+                        ></line>
+                        <line
+                            x1="12"
+                            y1="21"
+                            x2="12"
+                            y2="23"
+                        ></line>
+                        <line
+                            x1="4.22"
+                            y1="4.22"
+                            x2="5.64"
+                            y2="5.64"
+                        ></line>
+                        <line
+                            x1="18.36"
+                            y1="18.36"
+                            x2="19.78"
+                            y2="19.78"
+                        ></line>
+                        <line
+                            x1="1"
+                            y1="12"
+                            x2="3"
+                            y2="12"
+                        ></line>
+                        <line
+                            x1="21"
+                            y1="12"
+                            x2="23"
+                            y2="12"
+                        ></line>
+                        <line
+                            x1="4.22"
+                            y1="19.78"
+                            x2="5.64"
+                            y2="18.36"
+                        ></line>
+                        <line
+                            x1="18.36"
+                            y1="5.64"
+                            x2="19.78"
+                            y2="4.22"
+                        ></line>
+                    </svg>
+                    <svg
+                        class="moon-icon"
+                        viewBox="0 0 24 24"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
             </div>
         </header>
         <div class="tabs">
@@ -474,6 +591,24 @@ const API_CLIENTES = 'http://localhost:8001';
 const API_PRODUTOS = 'http://localhost:8002';
 const API_PEDIDOS  = 'http://localhost:8003';
 
+/* Função nativa para alternar o tema Claro/Escuro */
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  if (currentTheme === 'light') {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+/* Restaura a preferência do usuário salva no navegador */
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') {
+  document.documentElement.setAttribute('data-theme', 'light');
+}
+
 function switchTab(name) {
   const names = ['dashboard','clientes','produtos','pedidos'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i] === name));
@@ -692,7 +827,7 @@ async function atualizarProduto() {
   try {
     const r = await fetch(`${API_PRODUTOS}/produtos/${encodeURIComponent(nome)}`, {
       method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({preco, Heritage, quantidade: qtd})
+      body: JSON.stringify({preco, quantidade: qtd})
     });
     const d = await r.json();
     if (r.ok) { showResult('edit-p-result', 'Atributos atualizados no NoSQL.', true); setTimeout(() => closeModal('modal-produto'), 1500); loadProdutosTab(); loadProdutosDash(); }
